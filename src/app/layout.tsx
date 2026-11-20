@@ -5,6 +5,7 @@ import { AppProviders } from "@/providers/app-providers";
 import { APP_NAME } from "@/lib/constants";
 import { getSiteUrl, HOME_DESCRIPTION, HOME_TITLE } from "@/lib/seo";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full font-sans">
         <SerwistProvider swUrl="/serwist/sw.js">
           <AppProviders>{children}</AppProviders>
+          <Analytics/>
         </SerwistProvider>
       </body>
     </html>
