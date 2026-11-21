@@ -48,7 +48,16 @@ export function SiteFooter({ variant = "home" }: { variant?: "home" | "site" }) 
       </div>
       <div className="border-t border-border/70">
         <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted-foreground">
-          © 2026 {APP_NAME}
+          © 2026 {APP_NAME}. Propriedade da{" "}
+          <a
+            href="https://redboalt.com/"
+            className="font-medium text-foreground underline-offset-2 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Redboalt - Navegando na Web
+          </a>
+          .
         </p>
       </div>
     </footer>
