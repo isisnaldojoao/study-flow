@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Clock3, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { SessionFormDialog } from "@/components/sessions/session-form-dialog";
+import { RecommendedPlan } from "@/components/study/recommended-plan";
 import { useSearch } from "@/components/layout/search-context";
 import {
   Badge,
@@ -22,11 +23,7 @@ import {
   DialogTitle,
   EmptyState,
 } from "@/components/ui";
-import {
-  useActivities,
-  useStudySessions,
-  useSubjects,
-} from "@/hooks/use-live-data";
+import { useStudyPlan } from "@/hooks/use-study-plan";
 import { ACTIVITY_TYPES } from "@/lib/constants";
 import {
   daysUntil,
@@ -37,7 +34,6 @@ import {
   urgencyLabels,
 } from "@/lib/dates";
 import { matchesSearch, urgencyBadgeVariant } from "@/lib/urgency";
-import { useAuth } from "@/providers/auth-provider";
 import {
   deleteActivity,
   setActivityStatus,
@@ -54,11 +50,8 @@ type ListItem =
   | { kind: "activity"; data: Activity };
 
 export default function PlanejamentoPage() {
-  const { user } = useAuth();
   const { search } = useSearch();
-  const subjects = useSubjects();
-  const sessions = useStudySessions();
-  const activities = useActivities();
+  const { user, subjects, sessions, activities, plan } = useStudyPlan();
   const [formOpen, setFormOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<StudySession | null>(null);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
@@ -139,7 +132,7 @@ export default function PlanejamentoPage() {
             Meu planejamento
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sessões de estudo, provas e atividades — provas vão para o dashboard
+            O plano recomendado diz o que estudar. A lista abaixo é a sua agenda.
           </p>
         </div>
         <Button onClick={openCreate} disabled={subjects.length === 0}>
@@ -147,6 +140,8 @@ export default function PlanejamentoPage() {
           Novo compromisso
         </Button>
       </div>
+
+      <RecommendedPlan plan={plan} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Horas planejadas" value={`${stats.plannedHours}h`} />

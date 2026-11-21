@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ActivityFormDialog } from "@/components/activities/activity-form-dialog";
+import { TopicManager } from "@/components/study/topic-manager";
 import { SubjectFormDialog } from "@/components/subjects/subject-form-dialog";
 import {
   Badge,
@@ -46,6 +47,7 @@ import {
   useMaterials,
   useReviewContents,
   useStudySessions,
+  useStudyTopics,
   useSubjects,
 } from "@/hooks/use-live-data";
 import { ACTIVITY_TYPES } from "@/lib/constants";
@@ -71,6 +73,7 @@ export default function DisciplinaDetailPage() {
   const sessions = useStudySessions();
   const materials = useMaterials(id);
   const reviews = useReviewContents(id);
+  const topics = useStudyTopics(id);
   const subject = subjects.find((s) => s.id === id) ?? null;
 
   const [editSubjectOpen, setEditSubjectOpen] = useState(false);
@@ -241,7 +244,7 @@ export default function DisciplinaDetailPage() {
             <BookOpen className="h-3.5 w-3.5" />
             Conteúdos
             <span className="rounded-md bg-foreground/10 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums">
-              {reviews.length}
+              {topics.length}
             </span>
           </TabsTrigger>
           <TabsTrigger value="materials">
@@ -287,6 +290,11 @@ export default function DisciplinaDetailPage() {
               </CardContent>
             </Card>
           </div>
+          <p className="text-sm text-muted-foreground">
+            {topics.length === 0
+              ? "Nenhum conteúdo cadastrado. O plano de hoje estima o tempo pela prova até você listar o que falta estudar."
+              : `${topics.filter((topic) => topic.status === "concluido").length} de ${topics.length} conteúdos concluídos.`}
+          </p>
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Próximos compromissos</CardTitle>
@@ -470,12 +478,15 @@ export default function DisciplinaDetailPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="contents">
+        <TabsContent value="contents" className="space-y-8">
+          <TopicManager subjectId={subject.id} activities={subjectActivities} topics={topics} />
+          <div className="space-y-2">
+            <h2 className="text-base font-semibold">Notas de revisão</h2>
           {reviews.length === 0 ? (
             <EmptyState
               icon={<FileText className="h-5 w-5" />}
-              title="Sem conteúdos de revisão"
-              description="Crie conteúdos na Central de revisão."
+              title="Sem notas de revisão"
+              description="Anotações feitas na Central de revisão aparecem aqui."
               action={
                 <Link href="/revisao">
                   <Button variant="outline">Ir para revisão</Button>
@@ -501,6 +512,7 @@ export default function DisciplinaDetailPage() {
               ))}
             </div>
           )}
+          </div>
         </TabsContent>
 
         <TabsContent value="materials">

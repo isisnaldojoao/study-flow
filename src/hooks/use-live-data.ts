@@ -8,6 +8,7 @@ import { listMaterials } from "@/services/materials";
 import { listNotifications } from "@/services/notifications";
 import { listFlashcards, listReviewContents } from "@/services/review";
 import { listStudySessions } from "@/services/study-sessions";
+import { listStudyTopics } from "@/services/study-topics";
 import { listSubjects } from "@/services/subjects";
 
 function useRemote<T>(load: () => Promise<T>, initial: T, deps: unknown[]) {
@@ -51,6 +52,19 @@ export function useActivities() {
 export function useStudySessions() {
   const { user } = useAuth();
   return useRemote(() => (user ? listStudySessions(user.id) : Promise.resolve([])), [], [user?.id]);
+}
+
+export function useStudyTopics(subjectId?: string) {
+  const { user } = useAuth();
+  return useRemote(
+    async () => {
+      if (!user) return [];
+      const items = await listStudyTopics(user.id);
+      return subjectId ? items.filter((topic) => topic.subjectId === subjectId) : items;
+    },
+    [],
+    [user?.id, subjectId]
+  );
 }
 
 export function useNotifications() {

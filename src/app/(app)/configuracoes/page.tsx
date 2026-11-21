@@ -23,9 +23,11 @@ import {
   SelectValue,
   Separator,
 } from "@/components/ui";
+import { resolveAvailability, WEEKDAY_LABELS } from "@/lib/availability";
 import { REMINDER_OPTIONS } from "@/lib/constants";
+import { formatMinutes } from "@/lib/dates";
 import { useAuth } from "@/providers/auth-provider";
-import type { ReminderOffset, ThemeMode, UserPreferences } from "@/types";
+import type { ReminderOffset, ThemeMode, UserPreferences, WeekAvailability } from "@/types";
 
 const profileSchema = z.object({
   name: z.string().min(3, "Informe o nome completo"),
@@ -49,6 +51,9 @@ export default function ConfiguracoesPage() {
   const { user, updateProfile, updatePassword } = useAuth();
   const { theme, setTheme } = useTheme();
   const [savingPrefs, setSavingPrefs] = useState(false);
+  const [availability, setAvailability] = useState<WeekAvailability>(() =>
+    resolveAvailability(user?.preferences)
+  );
 
   const profileForm = useForm<ProfileInput>({
     resolver: zodResolver(profileSchema),
@@ -91,11 +96,7 @@ export default function ConfiguracoesPage() {
     if (!user) return;
     setSavingPrefs(true);
     try {
-      const preferences: UserPreferences = {
-        ...user.preferences,
-        ...partial,
-      };
-      await updateProfile({ preferences });
+      await updateProfile({ preferences: partial });
       if (partial.theme) setTheme(partial.theme);
       toast.success("Preferências salvas.");
     } catch (error) {
@@ -121,6 +122,59 @@ export default function ConfiguracoesPage() {
           Perfil, aparência e preferências de lembretes
         </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Disponibilidade</CardTitle>
+          <CardDescription>
+            O plano usa esses minutos para decidir quanto estudar em cada dia.
+            A sugestão inicial é 1h30 nos dias úteis.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {WEEKDAY_LABELS.map((label, index) => (
+              <div key={label} className="space-y-1.5">
+                <Label htmlFor={`day-${index}`}>{label}</Label>
+                <Input
+                  id={`day-${index}`}
+                  type="number"
+                  min={0}
+                  max={720}
+                  step={15}
+                  value={availability.minutes[index]}
+                  onChange={(event) => {
+                    const next = [...availability.minutes] as WeekAvailability["minutes"];
+                    next[index] = Math.min(720, Math.max(0, Number(event.target.value) || 0));
+                    setAvailability({ ...availability, minutes: next });
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="max-w-xs space-y-1.5">
+            <Label htmlFor="study-start">Começar a estudar às</Label>
+            <Input
+              id="study-start"
+              type="time"
+              value={availability.startTime}
+              onChange={(event) =>
+                setAvailability({ ...availability, startTime: event.target.value || "19:00" })
+              }
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Meta da semana: {formatMinutes(availability.minutes.reduce((sum, value) => sum + value, 0))}
+          </p>
+          <Button
+            type="button"
+            disabled={savingPrefs}
+            onClick={() => void savePreferences({ availability })}
+          >
+            Salvar disponibilidade
+          </Button>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

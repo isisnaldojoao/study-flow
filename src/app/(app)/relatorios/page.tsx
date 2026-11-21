@@ -24,11 +24,8 @@ import {
   CardTitle,
   EmptyState,
 } from "@/components/ui";
-import {
-  useActivities,
-  useStudySessions,
-  useSubjects,
-} from "@/hooks/use-live-data";
+import { WeeklySummary } from "@/components/study/weekly-summary";
+import { useStudyPlan } from "@/hooks/use-study-plan";
 import {
   addDaysISO,
   formatDisplayDate,
@@ -37,9 +34,7 @@ import {
 } from "@/lib/dates";
 
 export default function RelatoriosPage() {
-  const subjects = useSubjects();
-  const activities = useActivities();
-  const sessions = useStudySessions();
+  const { subjects, activities, sessions, topics, plan } = useStudyPlan();
   const today = todayISO();
 
   const weeklyEvolution = useMemo(() => {
@@ -133,7 +128,7 @@ export default function RelatoriosPage() {
   }, [sessions, subjects]);
 
   const hasData =
-    activities.length > 0 || sessions.length > 0 || subjects.length > 0;
+    activities.length > 0 || sessions.length > 0 || subjects.length > 0 || topics.length > 0;
 
   if (!hasData) {
     return (
@@ -157,9 +152,15 @@ export default function RelatoriosPage() {
           Relatórios
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Evolução baseada nos seus dados locais
+          Minutos estudados nas sessões concluídas e o ritmo da semana
         </p>
       </div>
+
+      <Card>
+        <CardContent className="pt-6">
+          <WeeklySummary weekly={plan.weekly} />
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Metric title="Conclusão" value={`${completion.percent}%`} />

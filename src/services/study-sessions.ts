@@ -12,6 +12,7 @@ export type StudySessionFields = {
   startTime: string;
   endTime: string;
   notes?: string;
+  status?: SessionStatus;
 };
 
 export async function listStudySessions(userId: string) {
@@ -34,7 +35,7 @@ export async function createStudySession(userId: string, input: StudySessionFiel
     startTime: input.startTime,
     endTime: input.endTime,
     notes: input.notes ?? "",
-    status: "pendente",
+    status: input.status ?? "pendente",
     createdAt: nowISO(),
     updatedAt: nowISO(),
   });

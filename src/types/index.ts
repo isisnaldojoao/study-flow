@@ -29,11 +29,24 @@ export type NotificationType =
   | "upcoming"
   | "system";
 
+export type StudyDifficulty = "baixa" | "media" | "alta";
+
+export type StudyTopicStatus = "pendente" | "concluido";
+
+/** Index 0 = domingo … 6 = sábado. Minutos disponíveis para estudar. */
+export type WeekdayMinutes = [number, number, number, number, number, number, number];
+
+export interface WeekAvailability {
+  minutes: WeekdayMinutes;
+  startTime: string;
+}
+
 export interface UserPreferences {
   theme: ThemeMode;
   defaultReminderDays: ReminderOffset;
   notificationsEnabled: boolean;
   browserPushEnabled: boolean;
+  availability?: WeekAvailability;
 }
 
 export interface User {
@@ -84,6 +97,19 @@ export interface StudySession {
   endTime: string;
   notes: string;
   status: SessionStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StudyTopic {
+  id: string;
+  userId: string;
+  subjectId: string;
+  activityId?: string;
+  title: string;
+  estimatedMinutes: number;
+  difficulty: StudyDifficulty;
+  status: StudyTopicStatus;
   createdAt: string;
   updatedAt: string;
 }
