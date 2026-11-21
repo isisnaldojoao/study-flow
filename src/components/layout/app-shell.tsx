@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { SearchProvider, useSearch } from "@/components/layout/search-context";
@@ -9,6 +10,11 @@ import { SidebarPreferenceProvider } from "@/components/layout/sidebar-preferenc
 function ShellInner({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { search, setSearch } = useSearch();
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/sessao")) {
+    return <div className="min-h-dvh bg-background">{children}</div>;
+  }
 
   return (
     <div className="flex min-h-dvh w-full max-w-[100vw] overflow-x-clip bg-background">

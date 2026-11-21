@@ -106,7 +106,7 @@ function SidebarBrand({
               {APP_NAME}
             </p>
             <p className="mt-1 text-[11px] text-sidebar-muted">
-              Organização de estudos
+              O que estudar hoje
             </p>
           </div>
         )}

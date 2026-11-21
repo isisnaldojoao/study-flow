@@ -97,7 +97,7 @@ export function Header({ onMenuClick, search, onSearchChange }: HeaderProps) {
               <Input
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Buscar atividades, disciplinas..."
+                placeholder="Buscar disciplinas, provas, conteúdos..."
                 className="w-72 pl-9"
               />
             </div>

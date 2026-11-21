@@ -33,7 +33,7 @@ interface AuthContextValue {
   register: (input: RegisterInput) => Promise<"signed_in" | "confirm_email">;
   logout: () => void;
   resetPassword: (email: string) => Promise<void>;
-  updateProfile: (data: Partial<Pick<User, "name" | "preferences">>) => Promise<void>;
+  updateProfile: (data: { name?: string; preferences?: Partial<UserPreferences> }) => Promise<void>;
   updatePassword: (current: string, next: string) => Promise<void>;
 }
 

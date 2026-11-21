@@ -130,11 +130,23 @@ export async function getCurrentUser(): Promise<User | null> {
 
 export async function updateUserProfile(
   userId: string,
-  data: Partial<Pick<User, "name" | "preferences">>
+  data: { name?: string; preferences?: Partial<UserPreferences> }
 ) {
   const patch: Record<string, unknown> = {};
   if (data.name) patch.name = data.name.trim();
-  if (data.preferences) patch.preferences = data.preferences;
+  if (data.preferences) {
+    const { data: row, error: readError } = await getSupabase()
+      .from("profiles")
+      .select("preferences")
+      .eq("id", userId)
+      .maybeSingle();
+    if (readError) throw new Error(readError.message);
+    const server =
+      row?.preferences && typeof row.preferences === "object"
+        ? (row.preferences as Record<string, unknown>)
+        : {};
+    patch.preferences = { ...server, ...data.preferences };
+  }
   const { error } = await getSupabase().from("profiles").update(toSnake(patch)).eq("id", userId);
   if (error) throw new Error(error.message);
   notifyDataChange();

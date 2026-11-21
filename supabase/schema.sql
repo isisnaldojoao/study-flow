@@ -102,10 +102,24 @@ create table if not exists public.notifications (
   unique (user_id, dedupe_key)
 );
 
+create table if not exists public.study_topics (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  subject_id uuid not null references public.subjects (id) on delete cascade,
+  activity_id uuid references public.activities (id) on delete set null,
+  title text not null,
+  estimated_minutes integer not null default 40,
+  difficulty text not null default 'media',
+  status text not null default 'pendente',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create index if not exists subjects_user_idx on public.subjects (user_id);
 create index if not exists activities_user_idx on public.activities (user_id, date);
 create index if not exists sessions_user_idx on public.study_sessions (user_id, start_date);
 create index if not exists notifications_user_idx on public.notifications (user_id, created_at desc);
+create index if not exists study_topics_user_idx on public.study_topics (user_id, subject_id);
 
 alter table public.profiles enable row level security;
 alter table public.subjects enable row level security;
@@ -115,6 +129,7 @@ alter table public.review_contents enable row level security;
 alter table public.flashcards enable row level security;
 alter table public.materials enable row level security;
 alter table public.notifications enable row level security;
+alter table public.study_topics enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 drop policy if exists "profiles_update_own" on public.profiles;
@@ -126,6 +141,7 @@ drop policy if exists "reviews_own" on public.review_contents;
 drop policy if exists "cards_own" on public.flashcards;
 drop policy if exists "materials_own" on public.materials;
 drop policy if exists "notifications_own" on public.notifications;
+drop policy if exists "topics_own" on public.study_topics;
 
 create policy "profiles_select_own" on public.profiles for select using (auth.uid() = id);
 create policy "profiles_update_own" on public.profiles for update using (auth.uid() = id);
@@ -138,6 +154,7 @@ create policy "reviews_own" on public.review_contents for all using (auth.uid() 
 create policy "cards_own" on public.flashcards for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "materials_own" on public.materials for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 create policy "notifications_own" on public.notifications for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "topics_own" on public.study_topics for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 create or replace function public.handle_new_user()
 returns trigger

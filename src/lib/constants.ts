@@ -69,7 +69,7 @@ export const ACCEPTED_MATERIAL_TYPES = [
 export const ACCEPTED_MATERIAL_EXTENSIONS = ".pdf,.docx,.pptx,.jpg,.jpeg,.png,.webp,.gif,.txt";
 
 export const NAV_ITEMS = [
-  { href: "/dashboard", label: "Início", icon: "LayoutDashboard" },
+  { href: "/dashboard", label: "Hoje", icon: "LayoutDashboard" },
   { href: "/calendario", label: "Calendário", icon: "CalendarDays" },
   { href: "/disciplinas", label: "Minhas disciplinas", icon: "BookOpen" },
   { href: "/planejamento", label: "Meu planejamento", icon: "Clock3" },
